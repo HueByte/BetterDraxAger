@@ -6,6 +6,7 @@ using BetterDraxAger.Api.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,7 @@ public class AgeController : ControllerBase
     }
 
     [Authorize]
+    [EnableRateLimiting("click")]
     [HttpPost("click")]
     public async Task<IActionResult> Click()
     {
@@ -43,17 +45,15 @@ public class AgeController : ControllerBase
         if (userId is null)
             return Unauthorized();
 
-        await _db.ClickRecords.AddAsync(new ClickRecord
-        {
-            UserId = userId,
-            ClickedAt = DateTime.UtcNow
-        });
+        _db.ClickRecords.Add(new ClickRecord { UserId = userId, ClickedAt = DateTime.UtcNow });
 
-        await _db.Database.ExecuteSqlRawAsync(
-            "UPDATE \"AspNetUsers\" SET \"TotalClicks\" = \"TotalClicks\" + 1 WHERE \"Id\" = {0}", userId);
+        await _db.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.TotalClicks, u => u.TotalClicks + 1));
 
-        await _db.Database.ExecuteSqlRawAsync(
-            "UPDATE \"SiteStats\" SET \"TotalClicks\" = \"TotalClicks\" + 1 WHERE \"Id\" = 1");
+        await _db.SiteStats
+            .Where(s => s.Id == 1)
+            .ExecuteUpdateAsync(s => s.SetProperty(ss => ss.TotalClicks, ss => ss.TotalClicks + 1));
 
         await _db.SaveChangesAsync();
 

@@ -2,25 +2,22 @@ import { useState } from 'react'
 import styles from './BirthdayButton.module.css'
 
 interface Props {
-  onClick: () => Promise<void>
-  disabled: boolean
+  onClick: () => void
 }
 
-export function BirthdayButton({ onClick, disabled }: Props) {
+export function BirthdayButton({ onClick }: Props) {
   const [flashing, setFlashing] = useState(false)
 
-  const handleClick = async () => {
-    if (disabled || flashing) return
+  const handleClick = () => {
+    onClick()
     setFlashing(true)
-    await onClick()
-    setTimeout(() => setFlashing(false), 600)
+    setTimeout(() => setFlashing(false), 300)
   }
 
   return (
     <button
       className={`${styles.button} ${flashing ? styles.flash : ''}`}
       onClick={handleClick}
-      disabled={disabled || flashing}
     >
       🎂 Happy Birthday!
     </button>
