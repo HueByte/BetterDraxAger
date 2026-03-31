@@ -11,7 +11,8 @@ import { useAuth } from '../context/AuthContext'
 import { click, getTotal } from '../api/age'
 import styles from './HomePage.module.css'
 
-const AVATAR_URL = 'https://cdn.discordapp.com/embed/avatars/0.png'
+const AVATAR_URL = 'https://avatar-cyan.vercel.app/api/pfp/246249703044284426/bigimage'
+const AVATAR_FALLBACK = 'https://cdn.discordapp.com/avatars/246249703044284426/277f651ba36185a75dd349ad97c5dd44.webp?size=1024'
 
 export function HomePage() {
   const [total, setTotal] = useState(0)
@@ -53,7 +54,12 @@ export function HomePage() {
       <ClickEffect effects={effects} onDone={removeEffect} />
       <main className={styles.page}>
         <div className={styles.center}>
-          <img src={AVATAR_URL} alt="Drax" className={styles.avatar} />
+          <img
+            src={AVATAR_URL}
+            alt="Drax"
+            className={styles.avatar}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = AVATAR_FALLBACK }}
+          />
           <h1 className={styles.title}>Happy Birthday, Drax!</h1>
           <ClickCounter total={total} />
           {isAuthenticated ? (
