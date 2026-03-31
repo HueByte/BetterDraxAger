@@ -1,0 +1,67 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: rgba(13, 13, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(155, 42, 149, 0.2);
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg, #9b2a95, #ed8653);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: #99aab5;
+  font-size: 0.9rem;
+}
+
+.btn {
+  background: transparent;
+  border: 1px solid rgba(155, 42, 149, 0.5);
+  color: #c76d57;
+  border-radius: 6px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn:hover {
+  background: rgba(155, 42, 149, 0.15);
+  color: #fff;
+}
+
+.btnLink {
+  background: linear-gradient(90deg, #9b2a95, #ed8653);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.btnLink:hover {
+  opacity: 0.85;
+}

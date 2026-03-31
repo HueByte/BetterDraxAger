@@ -1,0 +1,19 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=/data/app.db"
+  },
+  "JwtSettings": {
+    "Issuer": "BetterDraxAger",
+    "Audience": "BetterDraxAger",
+    "SecretKey": "LEAVE_EMPTY_JWT_SECRET_ENV_VAR_OVERRIDES_THIS",
+    "ExpiryHours": "24"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "CorsOrigins": [ "https://yourdomain.com" ]
+}

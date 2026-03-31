@@ -1,0 +1,34 @@
+.container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.item {
+  position: absolute;
+  object-fit: contain;
+  animation: mlgSpin linear forwards;
+  image-rendering: pixelated;
+}
+
+@keyframes mlgSpin {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  15% {
+    transform:
+      translate(calc(var(--tx) * 0.05), calc(var(--ty) * 0.05))
+      rotate(calc(var(--spin) * 0.1))
+      scale(var(--scale-peak));
+    opacity: 1;
+  }
+  100% {
+    transform:
+      translate(var(--tx), var(--ty))
+      rotate(var(--spin))
+      scale(var(--scale-end));
+    opacity: 0;
+  }
+}

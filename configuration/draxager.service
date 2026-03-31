@@ -1,0 +1,17 @@
+[Unit]
+Description=BetterDraxAger API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/draxager/app
+ExecStart=/var/www/draxager/app/BetterDraxAger.Api
+Restart=always
+RestartSec=5
+
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=JwtSettings__SecretKey=REPLACE_WITH_STRONG_SECRET
+
+[Install]
+WantedBy=multi-user.target

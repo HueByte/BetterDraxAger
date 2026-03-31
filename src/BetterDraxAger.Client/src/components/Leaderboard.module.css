@@ -1,0 +1,67 @@
+.container {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(155, 42, 149, 0.25);
+  border-radius: 12px;
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #c76d57;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.row:hover {
+  background: rgba(155, 42, 149, 0.08);
+}
+
+.rank {
+  width: 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.username {
+  flex: 1;
+  color: #e0e0e0;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clicks {
+  color: #c76d57;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.empty {
+  color: #99aab5;
+  font-size: 0.95rem;
+  margin: 0;
+}
