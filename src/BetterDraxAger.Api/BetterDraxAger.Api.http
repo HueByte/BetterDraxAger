@@ -1,6 +1,11 @@
 @BetterDraxAger.Api_HostAddress = http://localhost:5114
 
-GET {{BetterDraxAger.Api_HostAddress}}/weatherforecast/
+GET {{BetterDraxAger.Api_HostAddress}}/api/age/total
+Accept: application/json
+
+###
+
+GET {{BetterDraxAger.Api_HostAddress}}/api/leaderboard
 Accept: application/json
 
 ###

@@ -5,6 +5,7 @@
 dist/
 publish/
 .env
+.dev/
 src/BetterDraxAger.Api/appsettings.json
 
 ## Claude Code
