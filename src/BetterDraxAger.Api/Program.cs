@@ -54,6 +54,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<ClickBufferService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<ClickBufferService>());
 
 var corsOrigins = builder.Configuration.GetSection("CorsOrigins").Get<string[]>()
     ?? ["http://localhost:5173"];

@@ -21,13 +21,16 @@ export function HomePage() {
 	const [effects, setEffects] = useState<ClickEffectItem[]>([]);
 	const effectIdRef = useRef(0);
 	const { isAuthenticated } = useAuth();
-	const { entries, refresh } = useLeaderboard(10);
+	const { entries, setEntries } = useLeaderboard();
 
 	useEffect(() => {
 		getTotal().then((res) => setTotal(res.data.total));
 	}, []);
 
-	useSignalR(useCallback((newTotal: number) => setTotal(newTotal), []));
+	useSignalR(
+		useCallback((newTotal: number) => setTotal(newTotal), []),
+		useCallback((newEntries) => setEntries(newEntries), [setEntries])
+	);
 
 	const handleClick = () => {
 		const count = 12 + Math.floor(Math.random() * 10);
@@ -37,9 +40,8 @@ export function HomePage() {
 		setEffects((prev) => [...prev, ...newEffects]);
 
 		click()
-			.then((res) => {
-				setYourTotal(res.data.yourTotal);
-				refresh();
+			.then(() => {
+				setYourTotal((prev) => (prev ?? 0) + 1);
 			})
 			.catch((err) => {
 				if (err?.response?.status === 429) {

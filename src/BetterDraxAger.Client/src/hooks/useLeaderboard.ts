@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { LeaderboardEntry } from '../api/leaderboard'
 import { getLeaderboard } from '../api/leaderboard'
 
-export function useLeaderboard(top = 10) {
+export function useLeaderboard(top = 50) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
 
   const refresh = useCallback(async () => {
@@ -18,5 +18,5 @@ export function useLeaderboard(top = 10) {
     refresh()
   }, [refresh])
 
-  return { entries, refresh }
+  return { entries, setEntries, refresh }
 }

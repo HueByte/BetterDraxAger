@@ -1,9 +1,16 @@
 import { useEffect, useRef } from 'react'
 import * as signalR from '@microsoft/signalr'
+import type { LeaderboardEntry } from '../api/leaderboard'
 
-export function useSignalR(onTotalUpdated: (total: number) => void) {
-  const callbackRef = useRef(onTotalUpdated)
-  callbackRef.current = onTotalUpdated
+export function useSignalR(
+  onTotalUpdated: (total: number) => void,
+  onLeaderboardUpdated?: (entries: LeaderboardEntry[]) => void
+) {
+  const totalRef = useRef(onTotalUpdated)
+  totalRef.current = onTotalUpdated
+
+  const leaderboardRef = useRef(onLeaderboardUpdated)
+  leaderboardRef.current = onLeaderboardUpdated
 
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
@@ -13,7 +20,11 @@ export function useSignalR(onTotalUpdated: (total: number) => void) {
       .build()
 
     connection.on('TotalUpdated', (total: number) => {
-      callbackRef.current(total)
+      totalRef.current(total)
+    })
+
+    connection.on('LeaderboardUpdated', (entries: LeaderboardEntry[]) => {
+      leaderboardRef.current?.(entries)
     })
 
     async function start() {

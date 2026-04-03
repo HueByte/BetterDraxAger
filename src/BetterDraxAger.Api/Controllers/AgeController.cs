@@ -1,14 +1,10 @@
 using System.Security.Claims;
 using BetterDraxAger.Api.Data;
 using BetterDraxAger.Api.DTOs;
-using BetterDraxAger.Api.Entities;
-using BetterDraxAger.Api.Hubs;
+using BetterDraxAger.Api.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 
 namespace BetterDraxAger.Api.Controllers;
 
@@ -17,14 +13,12 @@ namespace BetterDraxAger.Api.Controllers;
 public class AgeController : ControllerBase
 {
     private readonly AppDbContext _db;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IHubContext<AgeHub> _hubContext;
+    private readonly ClickBufferService _buffer;
 
-    public AgeController(AppDbContext db, UserManager<ApplicationUser> userManager, IHubContext<AgeHub> hubContext)
+    public AgeController(AppDbContext db, ClickBufferService buffer)
     {
         _db = db;
-        _userManager = userManager;
-        _hubContext = hubContext;
+        _buffer = buffer;
     }
 
     [HttpGet("total")]
@@ -37,7 +31,7 @@ public class AgeController : ControllerBase
     [Authorize]
     [EnableRateLimiting("click")]
     [HttpPost("click")]
-    public async Task<IActionResult> Click()
+    public IActionResult Click()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
                      ?? User.FindFirstValue(JwtClaimTypes.Sub);
@@ -45,31 +39,9 @@ public class AgeController : ControllerBase
         if (userId is null)
             return Unauthorized();
 
-        _db.ClickRecords.Add(new ClickRecord { UserId = userId, ClickedAt = DateTime.UtcNow });
+        _buffer.Enqueue(userId);
 
-        await _db.Users
-            .Where(u => u.Id == userId)
-            .ExecuteUpdateAsync(s => s.SetProperty(u => u.TotalClicks, u => u.TotalClicks + 1));
-
-        await _db.SiteStats
-            .Where(s => s.Id == 1)
-            .ExecuteUpdateAsync(s => s.SetProperty(ss => ss.TotalClicks, ss => ss.TotalClicks + 1));
-
-        await _db.SaveChangesAsync();
-
-        var newTotal = await _db.SiteStats
-            .Where(s => s.Id == 1)
-            .Select(s => s.TotalClicks)
-            .FirstAsync();
-
-        var yourTotal = await _db.Users
-            .Where(u => u.Id == userId)
-            .Select(u => u.TotalClicks)
-            .FirstAsync();
-
-        await _hubContext.Clients.All.SendAsync("TotalUpdated", newTotal);
-
-        return Ok(new ClickResponse(newTotal, yourTotal));
+        return Ok();
     }
 }
 
