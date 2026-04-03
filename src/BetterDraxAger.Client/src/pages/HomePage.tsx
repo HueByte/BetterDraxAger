@@ -17,12 +17,13 @@ const AVATAR_URL =
 
 export function HomePage() {
 	const [total, setTotal] = useState(0);
-	const [yourTotal, setYourTotal] = useState<number | null>(null);
 	const [rateLimited, setRateLimited] = useState(false);
 	const [effects, setEffects] = useState<ClickEffectItem[]>([]);
 	const effectIdRef = useRef(0);
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, username } = useAuth();
 	const { entries, setEntries } = useLeaderboard();
+
+	const yourTotal = entries.find((e) => e.username === username)?.clicks ?? null;
 
 	useEffect(() => {
 		getTotal().then((res) => setTotal(res.data.total));
@@ -41,9 +42,6 @@ export function HomePage() {
 		setEffects((prev) => [...prev, ...newEffects]);
 
 		click()
-			.then(() => {
-				setYourTotal((prev) => (prev ?? 0) + 1);
-			})
 			.catch((err) => {
 				if (err?.response?.status === 429) {
 					setRateLimited(true);

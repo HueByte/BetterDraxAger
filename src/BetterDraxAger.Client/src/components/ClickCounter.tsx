@@ -1,3 +1,4 @@
+import { useAnimatedCount } from "../hooks/useAnimatedCount";
 import styles from "./ClickCounter.module.css";
 
 interface Props {
@@ -5,11 +6,13 @@ interface Props {
 }
 
 export function ClickCounter({ total }: Props) {
+	const display = useAnimatedCount(total);
+
 	return (
 		<p className={styles.counter}>
 			Drax has been aged{" "}
-			<span key={total} className={styles.number}>
-				{total.toLocaleString()}
+			<span className={styles.number}>
+				{display.toLocaleString()}
 			</span>{" "}
 			{total === 1 ? "time" : "times"}
 		</p>

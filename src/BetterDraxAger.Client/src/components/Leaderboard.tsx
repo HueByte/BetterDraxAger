@@ -1,10 +1,25 @@
 import type { LeaderboardEntry } from '../api/leaderboard'
+import { useAnimatedCount } from '../hooks/useAnimatedCount'
 import styles from './Leaderboard.module.css'
 
 const MEDALS = ['🥇', '🥈', '🥉']
 
 interface Props {
   entries: LeaderboardEntry[]
+}
+
+function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
+  const display = useAnimatedCount(entry.clicks)
+
+  return (
+    <li className={styles.row}>
+      <span className={styles.rank}>
+        {MEDALS[entry.rank - 1] ?? `#${entry.rank}`}
+      </span>
+      <span className={styles.username}>{entry.username}</span>
+      <span className={styles.clicks}>{display.toLocaleString()}</span>
+    </li>
+  )
 }
 
 export function Leaderboard({ entries }: Props) {
@@ -17,13 +32,7 @@ export function Leaderboard({ entries }: Props) {
       <h2 className={styles.title}>Leaderboard</h2>
       <ul className={styles.list}>
         {entries.map((entry) => (
-          <li key={entry.username} className={styles.row}>
-            <span className={styles.rank}>
-              {MEDALS[entry.rank - 1] ?? `#${entry.rank}`}
-            </span>
-            <span className={styles.username}>{entry.username}</span>
-            <span className={styles.clicks}>{entry.clicks.toLocaleString()}</span>
-          </li>
+          <LeaderboardRow key={entry.username} entry={entry} />
         ))}
       </ul>
     </div>
