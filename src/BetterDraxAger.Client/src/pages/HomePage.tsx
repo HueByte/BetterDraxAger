@@ -7,6 +7,7 @@ import { ClickEffect, makeEffect } from "../components/ClickEffect";
 import type { ClickEffectItem } from "../components/ClickEffect";
 import { useSignalR } from "../hooks/useSignalR";
 import { useLeaderboard } from "../hooks/useLeaderboard";
+import type { LeaderboardEntry } from "../api/leaderboard";
 import { useAuth } from "../context/AuthContext";
 import { click, getTotal } from "../api/age";
 import styles from "./HomePage.module.css";
@@ -29,7 +30,7 @@ export function HomePage() {
 
 	useSignalR(
 		useCallback((newTotal: number) => setTotal(newTotal), []),
-		useCallback((newEntries) => setEntries(newEntries), [setEntries])
+		useCallback((newEntries: LeaderboardEntry[]) => setEntries(newEntries), [setEntries])
 	);
 
 	const handleClick = () => {
