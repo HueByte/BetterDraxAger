@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using BetterDraxAger.Api.Data;
 using BetterDraxAger.Api.DTOs;
-using BetterDraxAger.Api.Entities;
 using BetterDraxAger.Api.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +12,7 @@ public class ClickBufferService : BackgroundService
     private const int FlushThreshold = 200;
     private static readonly TimeSpan IdleTimeout = TimeSpan.FromSeconds(1);
 
-    private readonly ConcurrentQueue<BufferedClick> _queue = new();
+    private readonly ConcurrentQueue<string> _queue = new();
     private readonly SemaphoreSlim _signal = new(0);
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IHubContext<AgeHub> _hubContext;
@@ -26,7 +25,7 @@ public class ClickBufferService : BackgroundService
 
     public void Enqueue(string userId)
     {
-        _queue.Enqueue(new BufferedClick(userId, DateTime.UtcNow));
+        _queue.Enqueue(userId);
         _signal.Release();
     }
 
@@ -39,7 +38,7 @@ public class ClickBufferService : BackgroundService
             catch (OperationCanceledException) { break; }
 
             // Drain up to threshold or wait for idle timeout
-            var batch = new List<BufferedClick>();
+            var batch = new List<string>();
             var deadline = DateTime.UtcNow.Add(IdleTimeout);
 
             while (batch.Count < FlushThreshold && DateTime.UtcNow < deadline)
@@ -68,33 +67,30 @@ public class ClickBufferService : BackgroundService
         }
 
         // Flush remaining on shutdown
-        var final = new List<BufferedClick>();
+        var final = new List<string>();
         while (_queue.TryDequeue(out var click))
             final.Add(click);
         if (final.Count > 0)
             await FlushAsync(final, CancellationToken.None);
     }
 
-    private async Task FlushAsync(List<BufferedClick> batch, CancellationToken ct)
+    private async Task FlushAsync(List<string> batch, CancellationToken ct)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         // Group clicks by user
-        var grouped = batch.GroupBy(c => c.UserId)
-            .Select(g => new { UserId = g.Key, Count = g.Count(), Clicks = g.ToList() })
+        var grouped = batch.GroupBy(userId => userId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
             .ToList();
-
-        // Insert click records
-        var records = batch.Select(c => new ClickRecord { UserId = c.UserId, ClickedAt = c.ClickedAt }).ToList();
-        db.ClickRecords.AddRange(records);
 
         // Update per-user totals atomically
         foreach (var g in grouped)
         {
+            var count = g.Count;
             await db.Users
                 .Where(u => u.Id == g.UserId)
-                .ExecuteUpdateAsync(s => s.SetProperty(u => u.TotalClicks, u => u.TotalClicks + g.Count), ct);
+                .ExecuteUpdateAsync(s => s.SetProperty(u => u.TotalClicks, u => u.TotalClicks + count), ct);
         }
 
         // Update site total atomically
@@ -126,6 +122,4 @@ public class ClickBufferService : BackgroundService
 
         await _hubContext.Clients.All.SendAsync("LeaderboardUpdated", entries, ct);
     }
-
-    private record BufferedClick(string UserId, DateTime ClickedAt);
 }
