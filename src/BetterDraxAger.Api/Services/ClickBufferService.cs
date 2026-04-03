@@ -11,7 +11,7 @@ namespace BetterDraxAger.Api.Services;
 public class ClickBufferService : BackgroundService
 {
     private const int FlushThreshold = 200;
-    private static readonly TimeSpan IdleTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan IdleTimeout = TimeSpan.FromSeconds(1);
 
     private readonly ConcurrentQueue<BufferedClick> _queue = new();
     private readonly SemaphoreSlim _signal = new(0);
